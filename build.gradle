@@ -1,9 +1,11 @@
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
+
 plugins {
     id 'java'
-//    id "nebula.lint" version "17.5.0"
 }
 
-//gradleLint.rules += 'unused-dependency'
 
 group 'org.example'
 version '1.0-SNAPSHOT'
@@ -16,8 +18,8 @@ dependencies {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
 tasks.register('createDay') {
@@ -25,42 +27,50 @@ tasks.register('createDay') {
         String day = project.getProperty("day")
         String year = "2024"
         println("Building project for day #" + day + "")
-        copy {
-            from fileTree('./template') {
-                exclude 'bin/'
-                exclude 'build/'
-                include '**'
-            }
-            into 'day' + day
-            rename 'DayTEMPLATE.java', 'Day' + day + '.java'
-            rename 'DayTEMPLATETest.java', 'Day' + day + 'Test.java'
-            filter {
-                line -> line.replaceAll('TEMPLATE', day)
-            }
-        }
-        new File('settings.gradle') << '\n' << 'include \'day' + day + '\''
 
         // get input data
         String inputUrl = "https://adventofcode.com/$year/day/${Integer.parseInt(day)}/input"
         File tokenFile = rootProject.file("token.txt")
         if (tokenFile.exists()) {
             String sessionId = tokenFile.getText()
-            HttpURLConnection req = new URL(inputUrl).openConnection()
-            req.setRequestProperty("Cookie", "session=$sessionId")
-            println("URL " + inputUrl)
-            println("Headers : " + req.getRequestProperties())
-            if (req.getResponseCode() == 200) {
-                String inputData = req.getInputStream().getText()
+            HttpClient client = HttpClient.newHttpClient()
+            HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(inputUrl))
+                .header("Cookie", "session=$sessionId")
+                .GET()
+                .build()
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString())
+            if (response.statusCode() == 200) {
+                String inputData = response.body()
                 println("Input  data file  retrieved")
-                new File('day' + day + '/src/main/resources/input.txt') << inputData.trim()
+                createGradleProject(day, inputData)
             } else {
-                println("Input data file not available: reponse=${req.getResponseCode()}")
-                println("Body : \n${req.getInputStream().getText()}")
+                println("Input data file not available: reponse=${response.statusCode()}")
+                println("Body : \n${response.body()}")
             }
         } else {
             println("token.txt is needed to fetch input.txt automatically")
         }
+
     } else {
         println("Use property 'day' !")
     }
+}
+
+private void createGradleProject(String day, String inputData) {
+    copy {
+        from fileTree('./template') {
+            exclude 'bin/'
+            exclude 'build/'
+            include '**'
+        }
+        into 'day' + day
+        rename 'DayTEMPLATE.java', 'Day' + day + '.java'
+        rename 'DayTEMPLATETest.java', 'Day' + day + 'Test.java'
+        filter {
+            line -> line.replaceAll('TEMPLATE', day)
+        }
+    }
+    new File('settings.gradle') << '\n' << 'include \'day' + day + '\''
+    new File('day' + day + '/src/main/resources/input.txt') << inputData.trim()
 }
