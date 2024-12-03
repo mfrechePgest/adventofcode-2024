@@ -19,12 +19,14 @@ public class Day02 extends AbstractMultiStepDay<Long, Long> {
         day02.fullRun();
     }
 
+    @Override
     public Long resultStep1() {
         return data.stream()
                 .filter(level -> safeLevels(level, false))
                 .count();
     }
 
+    @Override
     public Long resultStep2() {
         return data.stream()
                 .filter(level -> safeLevels(level, true))
@@ -33,6 +35,7 @@ public class Day02 extends AbstractMultiStepDay<Long, Long> {
 
     private final List<List<Integer>> data = new ArrayList<>();
 
+    @Override
     public void readFile() throws IOException {
         try (BufferedReader br = getReader(this.getClass())) {
             String line = br.readLine();

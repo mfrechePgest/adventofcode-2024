@@ -1,6 +1,9 @@
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -24,6 +27,7 @@ public class Day01 extends AbstractMultiStepDay<Long, Long> {
     private final List<Long> rightList = new ArrayList<>();
 
 
+    @Override
     public Long resultStep1() {
         List<Long> sortedLeft = new ArrayList<>(leftList);
         List<Long> sortedRight = new ArrayList<>(rightList);
@@ -34,6 +38,7 @@ public class Day01 extends AbstractMultiStepDay<Long, Long> {
                 .sum();
     }
 
+    @Override
     public Long resultStep2() {
         Map<Long, Long> mapOccurences = rightList.stream()
                 .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
@@ -42,13 +47,14 @@ public class Day01 extends AbstractMultiStepDay<Long, Long> {
                 .sum();
     }
 
+    @Override
     public void readFile() throws IOException {
         try (BufferedReader br = getReader(this.getClass())) {
             String line = br.readLine();
             while (line != null) {
                 String[] splitted = line.split("\\s+");
-                leftList.add(Long.parseLong(splitted[0]));
-                rightList.add(Long.parseLong(splitted[1]));
+                leftList.add(Long.valueOf(splitted[0]));
+                rightList.add(Long.valueOf(splitted[1]));
                 line = br.readLine();
             }
         }

@@ -24,6 +24,7 @@ public class Day03 extends AbstractMultiStepDay<Long, Long> {
 
     private final List<String> formulas = new ArrayList<>();
 
+    @Override
     public Long resultStep1() {
         long result = 0L;
         for (String formula : formulas) {
@@ -41,6 +42,7 @@ public class Day03 extends AbstractMultiStepDay<Long, Long> {
         return result;
     }
 
+    @Override
     public Long resultStep2() {
         long result = 0L;
         String fullFormula = String.join("", formulas);
@@ -53,6 +55,7 @@ public class Day03 extends AbstractMultiStepDay<Long, Long> {
         return result;
     }
 
+    @Override
     public void readFile() throws IOException {
         try (BufferedReader br = getReader(this.getClass())) {
             String line = br.readLine();

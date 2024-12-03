@@ -16,14 +16,17 @@ public class DayTEMPLATE extends AbstractMultiStepDay<Long, Long> {
         dayTEMPLATE.fullRun();
     }
 
+    @Override
     public Long resultStep1() {
         return 0L;
     }
 
+    @Override
     public Long resultStep2() {
         return 0L;
     }
 
+    @Override
     public void readFile() throws IOException {
         try (BufferedReader br = getReader(this.getClass())) {
             String line = br.readLine();
