@@ -85,6 +85,7 @@ bin/
 
 day*/bin/
 day*/build/
+day*/src/main/resources/input.txt
 template/build/
 template/bin/
 tests/bin/
