@@ -25,52 +25,70 @@ java {
 tasks.register('createDay') {
     if (project.hasProperty("day")) {
         String day = project.getProperty("day")
-        String year = "2024"
-        println("Building project for day #" + day + "")
+        if (!(new File("day${day}/src/main/resources/input.txt").exists())) {
+            String year = "2024"
+            println("Building project for day #" + day + "")
 
-        // get input data
-        String inputUrl = "https://adventofcode.com/$year/day/${Integer.parseInt(day)}/input"
-        File tokenFile = rootProject.file("token.txt")
-        if (tokenFile.exists()) {
-            String sessionId = tokenFile.getText()
-            HttpClient client = HttpClient.newHttpClient()
-            HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(inputUrl))
-                .header("Cookie", "session=$sessionId")
-                .GET()
-                .build()
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString())
-            if (response.statusCode() == 200) {
-                String inputData = response.body()
-                println("Input  data file  retrieved")
-                createGradleProject(day, inputData)
+            // get input data
+            String inputUrl = "https://adventofcode.com/$year/day/${Integer.parseInt(day)}/input"
+            File tokenFile = rootProject.file("token.txt")
+            if (tokenFile.exists()) {
+                String sessionId = tokenFile.getText()
+                HttpClient client = HttpClient.newHttpClient()
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(URI.create(inputUrl))
+                        .header("Cookie", "session=$sessionId")
+                        .GET()
+                        .build()
+                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString())
+                if (response.statusCode() == 200) {
+                    String inputData = response.body()
+                    println("Input  data file  retrieved")
+                    createGradleProject(day, inputData)
+                } else {
+                    println("Input data file not available: reponse=${response.statusCode()}")
+                    println("Body : \n${response.body()}")
+                }
             } else {
-                println("Input data file not available: reponse=${response.statusCode()}")
-                println("Body : \n${response.body()}")
+                println("token.txt is needed to fetch input.txt automatically")
             }
         } else {
-            println("token.txt is needed to fetch input.txt automatically")
+            println("Input already retrieved, skipping...")
         }
-
     } else {
         println("Use property 'day' !")
     }
 }
 
 private void createGradleProject(String day, String inputData) {
-    copy {
-        from fileTree('./template') {
-            exclude 'bin/'
-            exclude 'build/'
-            include '**'
+    if (!(new File("day${day}").exists())) {
+        // if project folder don't exists, init project
+        println("Folder day${day} don't exists, initializing project")
+        copy {
+            from fileTree('./template') {
+                exclude 'bin/'
+                exclude 'build/'
+                include '**'
+            }
+            into 'day' + day
+            rename 'DayTEMPLATE.java', 'Day' + day + '.java'
+            rename 'DayTEMPLATETest.java', 'Day' + day + 'Test.java'
+            filter {
+                line -> line.replaceAll('TEMPLATE', day)
+            }
         }
-        into 'day' + day
-        rename 'DayTEMPLATE.java', 'Day' + day + '.java'
-        rename 'DayTEMPLATETest.java', 'Day' + day + 'Test.java'
-        filter {
-            line -> line.replaceAll('TEMPLATE', day)
+        new File('settings.gradle') << '\n' << 'include \'day' + day + '\''
+    }
+    new File('day' + day + '/src/main/resources/input.txt').write(inputData.trim())
+}
+
+
+subprojects {
+    afterEvaluate { subproject ->
+        if (subproject.tasks.findByName('run')) {
+            subproject.tasks.named('run') {
+                dependsOn rootProject.tasks.named('createDay')
+            }
         }
     }
-    new File('settings.gradle') << '\n' << 'include \'day' + day + '\''
-    new File('day' + day + '/src/main/resources/input.txt') << inputData.trim()
 }
