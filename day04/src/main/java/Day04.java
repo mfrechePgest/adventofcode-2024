@@ -4,6 +4,7 @@ import mf.map.Point;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -84,12 +85,13 @@ public class Day04 extends AbstractMultiStepDay<Long, Long> {
                 .map(point -> Direction.diagonals()
                         .map(dir -> oneStep(point, dir))
                         .filter(p -> p.isValid(0, wordSearch.getFirst().length(), 0, wordSearch.size()))
+                        .sorted(Comparator.comparingDouble(Point::y).thenComparingDouble(Point::x))
                         .map(this::getCharAt)
-                        .sorted()
-                        .map(String::valueOf)
-                        .collect(Collectors.joining())
+                        .filter(c -> c == 'M' || c == 'S')
+                        .toList()
                 )
-                .filter(word -> word.equals("MMSS"))
+                .filter(word -> word.size() == 4)
+                .filter(word ->  word.getFirst() != word.get(3) && word.get(1) != word.get(2)) // different character of the opposite one
                 .count();
     }
 
