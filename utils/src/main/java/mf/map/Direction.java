@@ -1,5 +1,8 @@
 package mf.map;
 
+import java.util.List;
+import java.util.stream.Stream;
+
 public enum Direction {
     NORTH('^') {
         @Override
@@ -101,4 +104,13 @@ public enum Direction {
 
     public abstract Direction left();
     public abstract Direction right();
+
+    public static Stream<List<Direction>> diagonals() {
+        return Stream.of(NORTH, SOUTH)
+                .flatMap(d -> Stream.of(Direction.values())
+                        .filter(d2 -> d2 != d.reversed())
+                        .filter(d2 -> d2 != d)
+                        .map(d2 -> List.of(d, d2))
+                );
+    }
 }

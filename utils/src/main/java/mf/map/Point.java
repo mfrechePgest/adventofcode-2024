@@ -1,6 +1,8 @@
 package mf.map;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 public final class Point {
@@ -40,12 +42,14 @@ public final class Point {
     }
 
     public Stream<Step> neighbours(double step, long mapXLowerBound, long mapXUpperBound, long mapYLowerBound, long mapYUpperBound) {
-        return Stream.of(
-                new Step(Point.of(x - step, y), Direction.WEST),
-                new Step(Point.of(x + step, y), Direction.EAST),
-                new Step(Point.of(x, y - step), Direction.NORTH),
-                new Step(Point.of(x, y + step), Direction.SOUTH)
-        ).filter(s -> s.pos().isValid(mapXLowerBound, mapXUpperBound, mapYLowerBound, mapYUpperBound));
+        return
+                Stream.of(
+                                new Step(Point.of(x - step, y), Direction.WEST),
+                                new Step(Point.of(x + step, y), Direction.EAST),
+                                new Step(Point.of(x, y - step), Direction.NORTH),
+                                new Step(Point.of(x, y + step), Direction.SOUTH)
+                        )
+                        .filter(s -> s.pos().isValid(mapXLowerBound, mapXUpperBound, mapYLowerBound, mapYUpperBound));
     }
 
     public double manhattanDist(Point p1) {
