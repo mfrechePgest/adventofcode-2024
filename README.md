@@ -18,7 +18,7 @@ On peut récup le token dans les cookies du browser quand on charge l'input via 
 
 `./gradlew run` pour tout lancer
 
-`./gradlew :day05:run -Pday=05` pour lancer le jour 5, par exemple
+`./gradlew :day05:run` pour lancer le jour 5, par exemple
 
 ## Tests
 
