@@ -25,38 +25,42 @@ java {
 tasks.register('createDay') {
     if (project.hasProperty("day")) {
         String day = project.getProperty("day")
-        if (!(new File("day${day}/src/main/resources/input.txt").exists())) {
-            String year = "2024"
-            println("Building project for day #" + day + "")
-
-            // get input data
-            String inputUrl = "https://adventofcode.com/$year/day/${Integer.parseInt(day)}/input"
-            File tokenFile = rootProject.file("token.txt")
-            if (tokenFile.exists()) {
-                String sessionId = tokenFile.getText()
-                HttpClient client = HttpClient.newHttpClient()
-                HttpRequest request = HttpRequest.newBuilder()
-                        .uri(URI.create(inputUrl))
-                        .header("Cookie", "session=$sessionId")
-                        .GET()
-                        .build()
-                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString())
-                if (response.statusCode() == 200) {
-                    String inputData = response.body()
-                    println("Input  data file  retrieved")
-                    createGradleProject(day, inputData)
-                } else {
-                    println("Input data file not available: reponse=${response.statusCode()}")
-                    println("Body : \n${response.body()}")
-                }
-            } else {
-                println("token.txt is needed to fetch input.txt automatically")
-            }
-        } else {
-            println("Input already retrieved, skipping...")
-        }
+        initProject(day)
     } else {
         println("Use property 'day' !")
+    }
+}
+
+private void initProject(String day) {
+    if (!(new File("day${day}/src/main/resources/input.txt").exists())) {
+        String year = "2024"
+        println("Building project for day #" + day + "")
+
+        // get input data
+        String inputUrl = "https://adventofcode.com/$year/day/${Integer.parseInt(day)}/input"
+        File tokenFile = rootProject.file("token.txt")
+        if (tokenFile.exists()) {
+            String sessionId = tokenFile.getText()
+            HttpClient client = HttpClient.newHttpClient()
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(inputUrl))
+                    .header("Cookie", "session=$sessionId")
+                    .GET()
+                    .build()
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString())
+            if (response.statusCode() == 200) {
+                String inputData = response.body()
+                println("Input  data file  retrieved")
+                createGradleProject(day, inputData)
+            } else {
+                println("Input data file not available: reponse=${response.statusCode()}")
+                println("Body : \n${response.body()}")
+            }
+        } else {
+            println("token.txt is needed to fetch input.txt automatically")
+        }
+    } else {
+        println("Input already retrieved, skipping...")
     }
 }
 
@@ -85,9 +89,15 @@ private void createGradleProject(String day, String inputData) {
 
 subprojects {
     afterEvaluate { subproject ->
+        subproject.tasks.register('fetchInput') {
+            String day = subproject.name.replace('day', '')
+            if (day != 'template') {
+                initProject(day)
+            }
+        }
         if (subproject.tasks.findByName('run')) {
             subproject.tasks.named('run') {
-                dependsOn rootProject.tasks.named('createDay')
+                dependsOn 'fetchInput'
             }
         }
     }
