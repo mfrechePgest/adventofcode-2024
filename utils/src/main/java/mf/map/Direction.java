@@ -23,6 +23,11 @@ public enum Direction {
         public Direction right() {
             return EAST;
         }
+
+        @Override
+        public boolean isInDirection(Point from, Point to) {
+            return from.x() == to.x() && from.y() > to.y();
+        }
     },
     SOUTH('v') {
         @Override
@@ -43,6 +48,11 @@ public enum Direction {
         @Override
         public Direction right() {
             return WEST;
+        }
+
+        @Override
+        public boolean isInDirection(Point from, Point to) {
+            return from.x() == to.x() && from.y() < to.y();
         }
     },
     EAST('>') {
@@ -65,6 +75,11 @@ public enum Direction {
         public Direction right() {
             return SOUTH;
         }
+
+        @Override
+        public boolean isInDirection(Point from, Point to) {
+            return from.x() < to.x() && from.y() == to.y();
+        }
     },
     WEST('<') {
         @Override
@@ -86,6 +101,11 @@ public enum Direction {
         public Direction right() {
             return NORTH;
         }
+
+        @Override
+        public boolean isInDirection(Point from, Point to) {
+            return from.x() > to.x() && from.y() == to.y();
+        }
     };
 
     private final char c;
@@ -104,6 +124,7 @@ public enum Direction {
 
     public abstract Direction left();
     public abstract Direction right();
+    public abstract boolean isInDirection(Point from, Point to);
 
     public static Stream<List<Direction>> diagonals() {
         return Stream.of(NORTH, SOUTH)
