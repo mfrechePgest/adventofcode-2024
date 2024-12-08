@@ -28,6 +28,9 @@ jobs:
       uses: gradle/actions/setup-gradle@v4
     - name: Build with Gradle
       run: ./gradlew build
+    - name: Test reports
+      uses: jeantessier/test-summary-action@v1
+      if: ${{ always() }}
 # commented until I find how to retrieve day property
 #    - name: Gradle run
 #      run: ./gradlew run
