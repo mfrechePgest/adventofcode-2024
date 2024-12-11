@@ -1,9 +1,13 @@
-public class DayTEMPLATETest extends AbstractMultiStepDayTest<DayTEMPLATE, Long, Long> {
+import java.util.Optional;
+
+public class DayTEMPLATETest extends AbstractMultipleSampleDayTest<DayTEMPLATE, Long, Long> {
 
     public static final String SAMPLE_FILE = "sample.txt";
 
     public DayTEMPLATETest() {
-        super(() -> new DayTEMPLATE(SAMPLE_FILE), 0L, 0L);
+        super(DayTEMPLATE::new,
+                new DayTestParam<>("sample.txt", Optional.of(0L), Optional.empty())
+        );
     }
 
 }

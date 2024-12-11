@@ -1,6 +1,8 @@
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
+import java.nio.file.Files
+import java.nio.file.Path
 
 plugins {
     id 'java'
@@ -32,7 +34,8 @@ tasks.register('createDay') {
 }
 
 private void initProject(String day) {
-    if (!(new File("day${day}/src/main/resources/input.txt").exists())) {
+    Path filePath = Path.of("day" + day, "src", "main", "resources", "input.txt");
+    if (!Files.exists(filePath)) {
         String year = "2024"
         println("Building project for day #" + day + "")
 
