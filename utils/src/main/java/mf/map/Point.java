@@ -41,15 +41,14 @@ public final class Point {
         return x >= mapXLowerBound && y >= mapYLowerBound && x < mapXUpperBound && y < mapYUpperBound;
     }
 
-    public Stream<Step> neighbours(double step, long mapXLowerBound, long mapXUpperBound, long mapYLowerBound, long mapYUpperBound) {
+    public Stream<Step> neighbours(double step) {
         return
                 Stream.of(
                                 new Step(Point.of(x - step, y), Direction.WEST),
                                 new Step(Point.of(x + step, y), Direction.EAST),
                                 new Step(Point.of(x, y - step), Direction.NORTH),
                                 new Step(Point.of(x, y + step), Direction.SOUTH)
-                        )
-                        .filter(s -> s.pos().isValid(mapXLowerBound, mapXUpperBound, mapYLowerBound, mapYUpperBound));
+                        );
     }
 
     public double manhattanDist(Point p1) {
