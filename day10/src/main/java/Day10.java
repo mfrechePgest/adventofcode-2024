@@ -22,6 +22,7 @@ public class Day10 extends AbstractMultiStepDay<Long, Long> {
     }
 
     List<List<Integer>> grid = new ArrayList<>();
+    private int mapWidth;
     List<Point> startingPositions = new ArrayList<>();
 
     @Override
@@ -41,6 +42,7 @@ public class Day10 extends AbstractMultiStepDay<Long, Long> {
                 visited.add(current);
                 current.neighbours(1)
                         .map(Step::pos)
+                        .filter(p -> p.isValid(0, mapWidth, 0, grid.size()))
                         .filter(p -> reusePath || !visited.contains(p))
                         .filter(p -> getAltitude(p) == (getAltitude(current) + 1))
                         .forEach(queue::add);
@@ -67,6 +69,7 @@ public class Day10 extends AbstractMultiStepDay<Long, Long> {
             String line = br.readLine();
             int yIdx = 0;
             while (line != null) {
+                mapWidth = line.length();
                 grid.add(line.chars().map(Character::getNumericValue).boxed().toList());
                 String finalLine = line;
                 int finalYIdx = yIdx;
